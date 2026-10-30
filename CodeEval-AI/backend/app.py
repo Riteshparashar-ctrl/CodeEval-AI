@@ -1,0 +1,103 @@
+"""FastAPI backend: serves the evaluation API and the static dashboard."""
+import os
+from contextlib import contextmanager
+from typing import Dict, Optional
+
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+
+from evaluator import report, storage
+from evaluator.dataset import ROOT, load_tasks, public_view
+from evaluator.runner import evaluate_code
+
+app = FastAPI(title="CodeEval AI", version="1.0.0")
+TASKS = load_tasks()
+BY_ID = {t["id"]: t for t in TASKS}
+
+
+@contextmanager
+def db():
+    conn = storage.connect(os.environ.get("CODEEVAL_DB") or None)
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+
+class EvaluateRequest(BaseModel):
+    model_name: str = Field(min_length=1, max_length=100)
+    model_version: str = Field(default="", max_length=100)
+    task_id: str
+    code: str = Field(min_length=1, max_length=50000)
+    run_index: int = Field(default=1, ge=1, le=1000)
+    manual_review: Optional[Dict[str, float]] = None
+
+
+@app.get("/api/tasks")
+def list_tasks():
+    return [public_view(t) for t in TASKS]
+
+
+@app.get("/api/tasks/{task_id}")
+def get_task(task_id: str):
+    if task_id not in BY_ID:
+        raise HTTPException(404, "unknown task")
+    return public_view(BY_ID[task_id])
+
+
+@app.post("/api/evaluate")
+def evaluate(req: EvaluateRequest):
+    task = BY_ID.get(req.task_id)
+    if task is None:
+        raise HTTPException(404, "unknown task")
+    try:
+        ev = evaluate_code(task, req.code, req.manual_review)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    with db() as conn:
+        sid = storage.save_evaluation(conn, task, req.model_name.strip(), req.model_version.strip(), req.code,
+                                      ev, req.run_index, source="manual")
+    for t in ev["tests"]:  # do not leak hidden test data back to the caller
+        if t["hidden"]:
+            t["args_repr"] = t["expected_repr"] = t["actual_repr"] = None
+    return {"submission_id": sid, **ev}
+
+
+@app.get("/api/summary")
+def get_summary(include_demo: bool = False):
+    with db() as c:
+        return storage.summary(c, len(TASKS), include_demo)
+
+
+@app.get("/api/models")
+def get_models(include_demo: bool = False):
+    with db() as c:
+        return storage.model_comparison(c, include_demo)
+
+
+@app.get("/api/task-performance")
+def get_task_perf(include_demo: bool = False):
+    with db() as c:
+        return storage.task_performance(c, TASKS, include_demo)
+
+
+@app.get("/api/difficulty")
+def get_difficulty(include_demo: bool = False):
+    with db() as c:
+        return storage.difficulty_performance(c, include_demo)
+
+
+@app.get("/api/failures")
+def get_failures(include_demo: bool = False):
+    with db() as c:
+        return report.failure_analysis(c, TASKS, include_demo)
+
+
+@app.get("/api/submissions")
+def get_submissions(include_demo: bool = False):
+    with db() as c:
+        return storage.list_submissions(c, include_demo)
+
+
+app.mount("/", StaticFiles(directory=str(ROOT / "frontend"), html=True), name="ui")

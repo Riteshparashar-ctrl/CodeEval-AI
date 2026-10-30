@@ -1,0 +1,9 @@
+{
+  "_comment": "Copy to models.json. Replace placeholders with real model ids. Entries without credentials are skipped; nothing is ever invented.",
+  "models": [
+    {"name": "my-openai-compatible-model", "version": "REPLACE_WITH_MODEL_ID", "adapter": "openai_compatible",
+     "base_url": "https://api.openai.com/v1", "api_key_env": "OPENAI_API_KEY", "model": "REPLACE_WITH_MODEL_ID", "temperature": 0.7, "enabled": false},
+    {"name": "my-anthropic-model", "version": "REPLACE_WITH_MODEL_ID", "adapter": "anthropic",
+     "api_key_env": "ANTHROPIC_API_KEY", "model": "REPLACE_WITH_MODEL_ID", "max_tokens": 2048, "enabled": false}
+  ]
+}

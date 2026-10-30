@@ -1,0 +1,176 @@
+{
+  "version": "1.0",
+  "note": "All tasks are original. kind: basic=functional, edge=edge cases, logic=wrong-assumption traps, validation=input validation, perf=complexity (expected output computed from the reference solution). Only basic tests are public; all others are hidden from model prompts.",
+  "tasks": [
+    {
+      "id": "CE-E01", "title": "Second Largest Distinct Value", "difficulty": "Easy", "topic": "arrays", "function": "second_largest",
+      "description": "Given a list of integers, return the second largest DISTINCT value. Raise ValueError if nums is not a list of ints or contains fewer than two distinct values.",
+      "input_format": "nums: list[int], up to 300000 elements", "expected_output": "int",
+      "reference_complexity": "O(n) time, O(1) space",
+      "evaluation_criteria": ["Duplicates of the maximum are not the second largest", "Handles negative numbers", "Linear or n log n time", "Raises ValueError on invalid input"],
+      "tests": [
+        {"kind": "basic", "args": [[1, 2, 3]], "expected": 2},
+        {"kind": "basic", "args": [[10, 5, 8, 1]], "expected": 8},
+        {"kind": "edge", "args": [[-5, -1, -1, -9]], "expected": -5, "note": "negatives with duplicated maximum"},
+        {"kind": "edge", "args": [[2, 1]], "expected": 1, "note": "minimum valid length"},
+        {"kind": "logic", "args": [[5, 5, 4]], "expected": 4, "note": "duplicate maximum must not count as second largest"},
+        {"kind": "logic", "args": [[7, 7, 7, 3, 3]], "expected": 3, "note": "second largest is by distinct value"},
+        {"kind": "validation", "args": [[5, 5, 5]], "raises": "ValueError", "note": "fewer than two distinct values"},
+        {"kind": "perf", "args_expr": "[[(i*7919)%100003 for i in range(300000)]]", "note": "300k elements"}
+      ]
+    },
+    {
+      "id": "CE-E02", "title": "Alphanumeric Palindrome", "difficulty": "Easy", "topic": "strings", "function": "is_palindrome",
+      "description": "Return True if s reads the same forwards and backwards when only letters and digits are considered and case is ignored. The empty string is a palindrome. Raise ValueError if s is not a string.",
+      "input_format": "s: str, up to 10^6 characters", "expected_output": "bool",
+      "reference_complexity": "O(n) time, O(n) space",
+      "evaluation_criteria": ["Ignores punctuation, spaces and underscores", "Case-insensitive", "Digits are compared", "Raises ValueError on non-string"],
+      "tests": [
+        {"kind": "basic", "args": ["racecar"], "expected": true},
+        {"kind": "basic", "args": ["hello"], "expected": false},
+        {"kind": "edge", "args": [""], "expected": true, "note": "empty string"},
+        {"kind": "edge", "args": ["A man, a plan, a canal: Panama"], "expected": true, "note": "punctuation, spaces, mixed case"},
+        {"kind": "logic", "args": ["0P"], "expected": false, "note": "digits are alphanumeric and must be compared"},
+        {"kind": "logic", "args": ["ab_a"], "expected": true, "note": "underscore is not alphanumeric"},
+        {"kind": "validation", "args": [123], "raises": "ValueError", "note": "non-string input"},
+        {"kind": "perf", "args_expr": "['ab'*250000+'ba'*250000]", "note": "1M characters"}
+      ]
+    },
+    {
+      "id": "CE-E03", "title": "Merge Two Sorted Lists", "difficulty": "Easy", "topic": "sorting / two pointers", "function": "merge_sorted",
+      "description": "Merge two lists of integers, each sorted in non-decreasing order, into one sorted list in linear time. Keep duplicates. Raise ValueError if either argument is not a list of ints sorted in non-decreasing order.",
+      "input_format": "a: list[int], b: list[int]", "expected_output": "list[int]",
+      "reference_complexity": "O(n + m) time",
+      "evaluation_criteria": ["Keeps duplicates", "Handles empty lists", "Linear time (no repeated insertion)", "Validates sortedness"],
+      "tests": [
+        {"kind": "basic", "args": [[1, 3], [2, 4]], "expected": [1, 2, 3, 4]},
+        {"kind": "basic", "args": [[1, 2, 3], [4, 5]], "expected": [1, 2, 3, 4, 5]},
+        {"kind": "edge", "args": [[], []], "expected": [], "note": "both empty"},
+        {"kind": "edge", "args": [[], [1]], "expected": [1], "note": "one side empty"},
+        {"kind": "logic", "args": [[1, 1], [1]], "expected": [1, 1, 1], "note": "duplicates preserved"},
+        {"kind": "logic", "args": [[1, 2, 3], [0]], "expected": [0, 1, 2, 3], "note": "second list smaller than everything in first"},
+        {"kind": "validation", "args": [[3, 1], [2]], "raises": "ValueError", "note": "unsorted input"},
+        {"kind": "perf", "args_expr": "[list(range(0,400000,2)), list(range(1,400000,2))]", "note": "2 x 200k elements"}
+      ]
+    },
+    {
+      "id": "CE-M01", "title": "Maximum Subarray Sum", "difficulty": "Medium", "topic": "arrays / dynamic programming", "function": "max_subarray_sum",
+      "description": "Return the largest sum of a non-empty contiguous subarray of nums. If every element is negative, return the largest element. Raise ValueError if nums is empty or not a list of ints.",
+      "input_format": "nums: list[int], 1 to 500000 elements", "expected_output": "int",
+      "reference_complexity": "O(n) time, O(1) space",
+      "evaluation_criteria": ["All-negative arrays handled", "Subarray must be non-empty", "Linear time", "Validates empty input"],
+      "tests": [
+        {"kind": "basic", "args": [[1, -2, 3, 4]], "expected": 7},
+        {"kind": "basic", "args": [[2, 3, -1]], "expected": 5},
+        {"kind": "edge", "args": [[-3]], "expected": -3, "note": "single negative element"},
+        {"kind": "edge", "args": [[-2, -1, -3]], "expected": -1, "note": "all negative: empty subarray not allowed"},
+        {"kind": "logic", "args": [[5, -9, 6, -1, 2]], "expected": 7, "note": "must not extend through a large negative"},
+        {"kind": "logic", "args": [[-2, 1, -3, 4, -1, 2, 1, -5, 4]], "expected": 6, "note": "best subarray in the middle"},
+        {"kind": "validation", "args": [[]], "raises": "ValueError", "note": "empty list"},
+        {"kind": "perf", "args_expr": "[[((i*37)%101)-50 for i in range(500000)]]", "note": "500k elements"}
+      ]
+    },
+    {
+      "id": "CE-M02", "title": "First Occurrence Binary Search", "difficulty": "Medium", "topic": "searching", "function": "binary_search_first",
+      "description": "nums is sorted in ascending order and may contain duplicates. Return the index of the FIRST occurrence of target, or -1 if it is absent. The solution must run in O(log n). Raise ValueError if nums is not a list.",
+      "input_format": "nums: list[int] (sorted), target: int", "expected_output": "int",
+      "reference_complexity": "O(log n) per call",
+      "evaluation_criteria": ["Returns the leftmost index among duplicates", "Handles empty list", "Target larger than all elements", "Logarithmic time"],
+      "tests": [
+        {"kind": "basic", "args": [[1, 2, 2, 2, 3], 2], "expected": 1},
+        {"kind": "basic", "args": [[1, 2, 3], 4], "expected": -1},
+        {"kind": "edge", "args": [[], 1], "expected": -1, "note": "empty list"},
+        {"kind": "edge", "args": [[5], 5], "expected": 0, "note": "single element"},
+        {"kind": "logic", "args": [[2, 2, 2, 2], 2], "expected": 0, "note": "all elements equal target"},
+        {"kind": "logic", "args": [[1, 2, 2, 3], 3], "expected": 3, "note": "target at the last index"},
+        {"kind": "validation", "args": ["abc", 1], "raises": "ValueError", "note": "nums is not a list"},
+        {"kind": "perf", "args_expr": "[list(range(1000000)), 999999]", "repeat": 300, "note": "300 lookups in a 1M list"}
+      ]
+    },
+    {
+      "id": "CE-M03", "title": "Group Anagrams", "difficulty": "Medium", "topic": "strings / hashing", "function": "group_anagrams",
+      "description": "Group words that are anagrams of each other (case-sensitive; duplicates are kept). Return a list of groups: sort the words inside every group ascending, then sort the groups by their first word. Raise ValueError if words is not a list of strings.",
+      "input_format": "words: list[str], up to 100000 words", "expected_output": "list[list[str]]",
+      "reference_complexity": "O(n * k log k)",
+      "evaluation_criteria": ["Canonical output ordering", "Case-sensitive grouping", "Duplicates preserved", "Handles empty list and empty string"],
+      "tests": [
+        {"kind": "basic", "args": [["eat", "tea", "tan", "ate", "nat", "bat"]], "expected": [["ate", "eat", "tea"], ["bat"], ["nat", "tan"]]},
+        {"kind": "basic", "args": [["abc", "bca", "cab", "xyz"]], "expected": [["abc", "bca", "cab"], ["xyz"]]},
+        {"kind": "edge", "args": [[]], "expected": [], "note": "empty list"},
+        {"kind": "edge", "args": [[""]], "expected": [[""]], "note": "empty string word"},
+        {"kind": "logic", "args": [["a", "A"]], "expected": [["A"], ["a"]], "note": "case-sensitive: a and A are not anagrams"},
+        {"kind": "logic", "args": [["ab", "ba", "ab"]], "expected": [["ab", "ab", "ba"]], "note": "duplicates must be kept"},
+        {"kind": "validation", "args": [[1, 2]], "raises": "ValueError", "note": "non-string items"},
+        {"kind": "perf", "args_expr": "[[str(i) for i in range(100000)]]", "note": "100k words"}
+      ]
+    },
+    {
+      "id": "CE-M04", "title": "Balanced Brackets", "difficulty": "Medium", "topic": "data structures (stack)", "function": "valid_parentheses",
+      "description": "Return True if the brackets ()[]{} in s are balanced and correctly nested. All other characters are ignored. Raise ValueError if s is not a string.",
+      "input_format": "s: str, up to 500000 characters", "expected_output": "bool",
+      "reference_complexity": "O(n) time, O(n) space",
+      "evaluation_criteria": ["Unclosed opening brackets rejected", "Closing bracket on empty stack rejected", "Interleaved brackets rejected", "No recursion depth failure on long input"],
+      "tests": [
+        {"kind": "basic", "args": ["()[]{}"], "expected": true},
+        {"kind": "basic", "args": ["(]"], "expected": false},
+        {"kind": "edge", "args": [""], "expected": true, "note": "empty string"},
+        {"kind": "edge", "args": ["("], "expected": false, "note": "unclosed opening bracket"},
+        {"kind": "logic", "args": ["([)]"], "expected": false, "note": "interleaved brackets"},
+        {"kind": "logic", "args": ["a(b)c[d]"], "expected": true, "note": "non-bracket characters ignored"},
+        {"kind": "validation", "args": [null], "raises": "ValueError", "note": "None input"},
+        {"kind": "perf", "args_expr": "['('*250000+')'*250000]", "note": "500k nested brackets"}
+      ]
+    },
+    {
+      "id": "CE-H01", "title": "Longest Strictly Increasing Subsequence", "difficulty": "Hard", "topic": "dynamic programming / binary search", "function": "longest_increasing_subsequence",
+      "description": "Return the length of the longest STRICTLY increasing subsequence of nums (elements need not be contiguous). The solution must handle 200000 elements. Raise ValueError if nums is not a list of ints.",
+      "input_format": "nums: list[int], up to 200000 elements", "expected_output": "int",
+      "reference_complexity": "O(n log n) time",
+      "evaluation_criteria": ["Strictness (equal values do not extend)", "Empty list returns 0", "O(n log n) time", "Validates input type"],
+      "tests": [
+        {"kind": "basic", "args": [[10, 9, 2, 5, 3, 7, 101, 18]], "expected": 4},
+        {"kind": "basic", "args": [[0, 1, 0, 3, 2, 3]], "expected": 4},
+        {"kind": "edge", "args": [[]], "expected": 0, "note": "empty list"},
+        {"kind": "edge", "args": [[7]], "expected": 1, "note": "single element"},
+        {"kind": "logic", "args": [[7, 7, 7, 7]], "expected": 1, "note": "equal values are not strictly increasing"},
+        {"kind": "logic", "args": [[3, 10, 2, 1, 20]], "expected": 3, "note": "non-contiguous subsequence"},
+        {"kind": "validation", "args": ["abc"], "raises": "ValueError", "note": "non-list input"},
+        {"kind": "perf", "args_expr": "[[(i*7919)%100003 for i in range(200000)]]", "note": "200k elements (O(n^2) times out)"}
+      ]
+    },
+    {
+      "id": "CE-H02", "title": "Edit Distance", "difficulty": "Hard", "topic": "dynamic programming / strings", "function": "edit_distance",
+      "description": "Return the Levenshtein distance between strings a and b: the minimum number of single-character insertions, deletions and substitutions (each cost 1) needed to turn a into b. Raise ValueError unless both arguments are strings.",
+      "input_format": "a: str, b: str, each up to 1500 characters", "expected_output": "int",
+      "reference_complexity": "O(n * m) time, O(min(n, m)) space",
+      "evaluation_criteria": ["Substitution costs 1", "Empty-string cases", "Polynomial time (no naive recursion)", "Symmetry of the distance"],
+      "tests": [
+        {"kind": "basic", "args": ["kitten", "sitting"], "expected": 3},
+        {"kind": "basic", "args": ["flaw", "lawn"], "expected": 2},
+        {"kind": "edge", "args": ["", "abc"], "expected": 3, "note": "one empty string"},
+        {"kind": "edge", "args": ["", ""], "expected": 0, "note": "both empty"},
+        {"kind": "logic", "args": ["intention", "execution"], "expected": 5, "note": "mix of all three operations"},
+        {"kind": "logic", "args": ["sunday", "saturday"], "expected": 3, "note": "different lengths"},
+        {"kind": "validation", "args": [1, "a"], "raises": "ValueError", "note": "non-string argument"},
+        {"kind": "perf", "args_expr": "['ab'*750, 'ba'*750]", "note": "1500 x 1500 characters"}
+      ]
+    },
+    {
+      "id": "CE-H03", "title": "Count N-Queens Solutions", "difficulty": "Hard", "topic": "recursion / backtracking", "function": "n_queens_count",
+      "description": "Return the number of distinct ways to place n non-attacking queens on an n x n chessboard. Raise ValueError if n is not an int >= 1.",
+      "input_format": "n: int (1 <= n <= 10)", "expected_output": "int",
+      "reference_complexity": "Backtracking with pruning",
+      "evaluation_criteria": ["Diagonal conflicts handled", "Unsolvable boards (n=2,3) return 0", "Pruned backtracking (no full permutation scan)", "Validates n"],
+      "tests": [
+        {"kind": "basic", "args": [4], "expected": 2},
+        {"kind": "basic", "args": [6], "expected": 4},
+        {"kind": "edge", "args": [1], "expected": 1, "note": "1x1 board"},
+        {"kind": "edge", "args": [2], "expected": 0, "note": "no solution exists"},
+        {"kind": "logic", "args": [5], "expected": 10, "note": "odd board size"},
+        {"kind": "logic", "args": [8], "expected": 92, "note": "classic 8-queens"},
+        {"kind": "validation", "args": [0], "raises": "ValueError", "note": "n below 1"},
+        {"kind": "perf", "args_expr": "[10]", "note": "n=10 (permutation brute force times out)"}
+      ]
+    }
+  ]
+}
