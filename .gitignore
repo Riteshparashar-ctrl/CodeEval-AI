@@ -3,3 +3,5 @@ models.json
 __pycache__/
 .pytest_cache/
 results/*.db
+
+!results/demo_seed.db
