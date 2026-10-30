@@ -141,4 +141,5 @@ def serve_submit():
 
 
 if FRONTEND_DIR.exists():
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="ui")
+
+   app.mount("/", StaticFiles(directory=str(ROOT / "public"), html=True), name="ui")
