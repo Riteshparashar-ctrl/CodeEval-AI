@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Optional
 
-# Ensure project root is in sys.path
+# Ensure project root is importable (needed on Vercel)
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -22,7 +22,7 @@ from evaluator.runner import evaluate_code
 app = FastAPI(title="CodeEval AI", version="1.0.0")
 TASKS = load_tasks()
 BY_ID = {t["id"]: t for t in TASKS}
-FRONTEND_DIR = ROOT / "frontend"
+FRONTEND_DIR = ROOT / "public"
 
 
 @contextmanager
@@ -57,6 +57,8 @@ def get_task(task_id: str):
 
 @app.post("/api/evaluate")
 def evaluate(req: EvaluateRequest):
+    if os.environ.get("VERCEL"):  # never run arbitrary submitted code on a public deployment
+        raise HTTPException(403, "Evaluation is disabled on the public deployment. Run CodeEval AI locally.")
     task = BY_ID.get(req.task_id)
     if task is None:
         raise HTTPException(404, "unknown task")
@@ -65,8 +67,8 @@ def evaluate(req: EvaluateRequest):
     except ValueError as e:
         raise HTTPException(422, str(e))
     with db() as conn:
-        sid = storage.save_evaluation(conn, task, req.model_name.strip(), req.model_version.strip(), req.code,
-                                      ev, req.run_index, source="manual")
+        sid = storage.save_evaluation(conn, task, req.model_name.strip(), req.model_version.strip(),
+                                      req.code, ev, req.run_index, source="manual")
     for t in ev["tests"]:  # do not leak hidden test data back to the caller
         if t["hidden"]:
             t["args_repr"] = t["expected_repr"] = t["actual_repr"] = None
@@ -109,37 +111,31 @@ def get_submissions(include_demo: bool = False, limit: int = 100):
         return storage.list_submissions(c, include_demo, limit=limit)
 
 
+def _page(name: str):
+    f = FRONTEND_DIR / name
+    if not f.exists():
+        raise HTTPException(404, f"{name} not found in public/")
+    return FileResponse(f)
+
+
 @app.get("/", include_in_schema=False)
-def serve_root():
-    index_file = FRONTEND_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(index_file)
-    raise HTTPException(404, "Frontend index not found")
-
-
 @app.get("/index.html", include_in_schema=False)
-def serve_index():
-    return serve_root()
+def serve_root():
+    return _page("index.html")
 
 
 @app.get("/failures", include_in_schema=False)
 @app.get("/failures.html", include_in_schema=False)
 def serve_failures():
-    f_file = FRONTEND_DIR / "failures.html"
-    if f_file.exists():
-        return FileResponse(f_file)
-    raise HTTPException(404, "Failures page not found")
+    return _page("failures.html")
 
 
 @app.get("/submit", include_in_schema=False)
 @app.get("/submit.html", include_in_schema=False)
 def serve_submit():
-    s_file = FRONTEND_DIR / "submit.html"
-    if s_file.exists():
-        return FileResponse(s_file)
-    raise HTTPException(404, "Submit page not found")
+    return _page("submit.html")
 
 
+# Static assets (app.js, style.css). Mounted last so the routes above win.
 if FRONTEND_DIR.exists():
-
-   app.mount("/", StaticFiles(directory=str(ROOT / "public"), html=True), name="ui")
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="ui")
