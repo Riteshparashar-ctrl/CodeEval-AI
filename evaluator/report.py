@@ -1,6 +1,12 @@
 """Failure analysis computed from stored evaluation results (never from invented data)."""
 import json
+import sys
 from pathlib import Path
+
+# Ensure ROOT is in sys.path
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from .dataset import ROOT
 from .runner import ROOT_CAUSE
@@ -9,11 +15,20 @@ from .storage import _f, _rows, difficulty_performance, summary, task_performanc
 REPORT_DIR = ROOT / "reports"
 
 
-def failure_analysis(conn, tasks, include_demo=False):
+def failure_analysis(conn, tasks, include_demo=False, task_id=None, model_name=None):
     f = _f(include_demo)
-    base = "FROM test_results r JOIN submissions s ON s.id=r.submission_id WHERE r.passed=0" + f
-    by_cat = {r["category"]: r["c"] for r in _rows(conn, f"SELECT r.category, COUNT(*) c {base} GROUP BY r.category ORDER BY c DESC")}
-    by_kind = {r["kind"]: r["c"] for r in _rows(conn, f"SELECT r.kind, COUNT(*) c {base} GROUP BY r.kind ORDER BY c DESC")}
+    filter_clause = ""
+    params = []
+    if task_id:
+        filter_clause += " AND s.task_id=?"
+        params.append(task_id)
+    if model_name:
+        filter_clause += " AND s.model_name=?"
+        params.append(model_name)
+
+    base = "FROM test_results r JOIN submissions s ON s.id=r.submission_id WHERE r.passed=0" + f + filter_clause
+    by_cat = {r["category"]: r["c"] for r in _rows(conn, f"SELECT r.category, COUNT(*) c {base} GROUP BY r.category ORDER BY c DESC", params)}
+    by_kind = {r["kind"]: r["c"] for r in _rows(conn, f"SELECT r.kind, COUNT(*) c {base} GROUP BY r.kind ORDER BY c DESC", params)}
     root = {}
     for cat, c in by_cat.items():
         root[ROOT_CAUSE.get(cat, cat)] = root.get(ROOT_CAUSE.get(cat, cat), 0) + c
@@ -22,15 +37,17 @@ def failure_analysis(conn, tasks, include_demo=False):
         if t["attempts"]:
             subs = _rows(conn, f"SELECT COUNT(*) c FROM submissions s WHERE s.task_id=? AND s.tests_failed>0{f}", (t["task_id"],))[0]["c"]
             tasks_ranked.append({**t, "submissions_with_failures": subs, "failure_rate_pct": round(100 * subs / t["attempts"], 2)})
-    tasks_ranked.sort(key=lambda x: (-x["failure_rate_pct"], -x["tests_failed"]))
+        else:
+            tasks_ranked.append({**t, "submissions_with_failures": 0, "failure_rate_pct": 0.0})
+    tasks_ranked.sort(key=lambda x: (-x["failure_rate_pct"], -x["tests_failed"], -x["attempts"]))
     edge_cases = _rows(conn, "SELECT r.test_id, r.kind, r.note, COUNT(*) failures " + base +
-                       " AND r.kind!='basic' GROUP BY r.test_id ORDER BY failures DESC, r.test_id LIMIT 15")
+                       " AND r.kind!='basic' GROUP BY r.test_id ORDER BY failures DESC, r.test_id LIMIT 15", params)
     examples = _rows(conn, "SELECT s.model_name, s.is_demo, s.task_id, r.test_id, r.kind, r.category, r.args, r.expected, r.actual " +
-                     base + " GROUP BY r.test_id, r.category ORDER BY MAX(s.id) DESC LIMIT 10")
+                     base + " GROUP BY r.test_id, r.category ORDER BY MAX(s.id) DESC LIMIT 10", params)
     for e in examples:
         e["is_demo"] = bool(e["is_demo"])
     diff = difficulty_performance(conn, include_demo)
-    worst = max(diff, key=lambda d: d["failure_rate_pct"]) if any(d["attempts"] for d in diff) else None
+    worst = max(diff, key=lambda d: d["failure_rate_pct"]) if any(d.get("failure_rate_pct", 0) > 0 for d in diff) else None
     return {"summary": summary(conn, len(tasks), include_demo), "include_demo": include_demo, "by_category": by_cat,
             "by_kind": by_kind, "root_cause": root, "tasks_ranked": tasks_ranked, "edge_cases": edge_cases,
             "difficulty": diff, "hardest_difficulty": worst["difficulty"] if worst else None, "examples": examples}

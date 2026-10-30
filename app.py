@@ -1,6 +1,7 @@
 """Default FastAPI entrypoint for CodeEval AI."""
 import sys
 from pathlib import Path
+from pathlib import Path
 
 # Ensure root directory is on sys.path
 ROOT = Path(__file__).resolve().parent

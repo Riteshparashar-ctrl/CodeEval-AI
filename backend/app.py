@@ -1,19 +1,28 @@
 """FastAPI backend: serves the evaluation API and the static dashboard."""
 import os
+import sys
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Dict, Optional
 
+# Ensure project root is in sys.path
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from evaluator import report, storage
-from evaluator.dataset import ROOT, load_tasks, public_view
+from evaluator.dataset import load_tasks, public_view
 from evaluator.runner import evaluate_code
 
 app = FastAPI(title="CodeEval AI", version="1.0.0")
 TASKS = load_tasks()
 BY_ID = {t["id"]: t for t in TASKS}
+FRONTEND_DIR = ROOT / "frontend"
 
 
 @contextmanager
@@ -89,15 +98,47 @@ def get_difficulty(include_demo: bool = False):
 
 
 @app.get("/api/failures")
-def get_failures(include_demo: bool = False):
+def get_failures(include_demo: bool = False, task_id: Optional[str] = None, model_name: Optional[str] = None):
     with db() as c:
-        return report.failure_analysis(c, TASKS, include_demo)
+        return report.failure_analysis(c, TASKS, include_demo, task_id=task_id, model_name=model_name)
 
 
 @app.get("/api/submissions")
-def get_submissions(include_demo: bool = False):
+def get_submissions(include_demo: bool = False, limit: int = 100):
     with db() as c:
-        return storage.list_submissions(c, include_demo)
+        return storage.list_submissions(c, include_demo, limit=limit)
 
 
-app.mount("/", StaticFiles(directory=str(ROOT / "frontend"), html=True), name="ui")
+@app.get("/", include_in_schema=False)
+def serve_root():
+    index_file = FRONTEND_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    raise HTTPException(404, "Frontend index not found")
+
+
+@app.get("/index.html", include_in_schema=False)
+def serve_index():
+    return serve_root()
+
+
+@app.get("/failures", include_in_schema=False)
+@app.get("/failures.html", include_in_schema=False)
+def serve_failures():
+    f_file = FRONTEND_DIR / "failures.html"
+    if f_file.exists():
+        return FileResponse(f_file)
+    raise HTTPException(404, "Failures page not found")
+
+
+@app.get("/submit", include_in_schema=False)
+@app.get("/submit.html", include_in_schema=False)
+def serve_submit():
+    s_file = FRONTEND_DIR / "submit.html"
+    if s_file.exists():
+        return FileResponse(s_file)
+    raise HTTPException(404, "Submit page not found")
+
+
+if FRONTEND_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="ui")

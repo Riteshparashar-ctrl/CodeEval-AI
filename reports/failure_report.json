@@ -1,10 +1,10 @@
 {
   "summary": {
     "total_tasks": 10,
-    "evaluated_responses": 14,
-    "overall_accuracy_pct": 28.57,
-    "average_score": 88.39,
-    "tests_passed": 98,
+    "evaluated_responses": 17,
+    "overall_accuracy_pct": 41.18,
+    "average_score": 90.44,
+    "tests_passed": 122,
     "tests_failed": 14,
     "demo_responses": 14
   },
@@ -42,6 +42,17 @@
       "failure_rate_pct": 100.0
     },
     {
+      "task_id": "CE-H01",
+      "title": "Longest Strictly Increasing Subsequence",
+      "difficulty": "Hard",
+      "attempts": 2,
+      "avg_score": 90.0,
+      "accuracy_pct": 0.0,
+      "tests_failed": 2,
+      "submissions_with_failures": 2,
+      "failure_rate_pct": 100.0
+    },
+    {
       "task_id": "CE-E02",
       "title": "Alphanumeric Palindrome",
       "difficulty": "Easy",
@@ -60,28 +71,6 @@
       "avg_score": 67.5,
       "accuracy_pct": 0.0,
       "tests_failed": 2,
-      "submissions_with_failures": 1,
-      "failure_rate_pct": 100.0
-    },
-    {
-      "task_id": "CE-H01",
-      "title": "Longest Strictly Increasing Subsequence",
-      "difficulty": "Hard",
-      "attempts": 2,
-      "avg_score": 90.0,
-      "accuracy_pct": 0.0,
-      "tests_failed": 2,
-      "submissions_with_failures": 2,
-      "failure_rate_pct": 100.0
-    },
-    {
-      "task_id": "CE-E01",
-      "title": "Second Largest Distinct Value",
-      "difficulty": "Easy",
-      "attempts": 1,
-      "avg_score": 95.0,
-      "accuracy_pct": 0.0,
-      "tests_failed": 1,
       "submissions_with_failures": 1,
       "failure_rate_pct": 100.0
     },
@@ -117,6 +106,17 @@
       "tests_failed": 1,
       "submissions_with_failures": 1,
       "failure_rate_pct": 50.0
+    },
+    {
+      "task_id": "CE-E01",
+      "title": "Second Largest Distinct Value",
+      "difficulty": "Easy",
+      "attempts": 4,
+      "avg_score": 98.75,
+      "accuracy_pct": 75.0,
+      "tests_failed": 1,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 25.0
     },
     {
       "task_id": "CE-E03",
@@ -218,10 +218,10 @@
   "difficulty": [
     {
       "difficulty": "Easy",
-      "attempts": 4,
-      "avg_score": 93.12,
-      "accuracy_pct": 50.0,
-      "failure_rate_pct": 9.38
+      "attempts": 7,
+      "avg_score": 96.07,
+      "accuracy_pct": 71.43,
+      "failure_rate_pct": 5.36
     },
     {
       "difficulty": "Medium",

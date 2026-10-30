@@ -1,10 +1,10 @@
 # CodeEval AI - Failure Report
 
-Scope: INCLUDES DEMO DATA (synthetic, not model results). Submissions analysed: 14.
+Scope: INCLUDES DEMO DATA (synthetic, not model results). Submissions analysed: 17.
 
-- Average score: 88.39 / 100
-- Fully-correct responses: 28.57%
-- Test cases passed / failed: 98 / 14
+- Average score: 90.44 / 100
+- Fully-correct responses: 41.18%
+- Test cases passed / failed: 122 / 14
 - Difficulty with the highest test failure rate: Medium
 
 ## Root cause split (failed tests)
@@ -27,13 +27,13 @@ Scope: INCLUDES DEMO DATA (synthetic, not model results). Submissions analysed: 
 | Task | Difficulty | Attempts | Responses with failures | Rate % |
 |---|---|---|---|---|
 | CE-M01 Maximum Subarray Sum | Medium | 2 | 2 | 100.0 |
+| CE-H01 Longest Strictly Increasing Subsequence | Hard | 2 | 2 | 100.0 |
 | CE-E02 Alphanumeric Palindrome | Easy | 1 | 1 | 100.0 |
 | CE-M02 First Occurrence Binary Search | Medium | 1 | 1 | 100.0 |
-| CE-H01 Longest Strictly Increasing Subsequence | Hard | 2 | 2 | 100.0 |
-| CE-E01 Second Largest Distinct Value | Easy | 1 | 1 | 100.0 |
 | CE-M04 Balanced Brackets | Medium | 1 | 1 | 100.0 |
 | CE-H03 Count N-Queens Solutions | Hard | 1 | 1 | 100.0 |
 | CE-H02 Edit Distance | Hard | 2 | 1 | 50.0 |
+| CE-E01 Second Largest Distinct Value | Easy | 4 | 1 | 25.0 |
 | CE-E03 Merge Two Sorted Lists | Easy | 2 | 0 | 0.0 |
 | CE-M03 Group Anagrams | Medium | 1 | 0 | 0.0 |
 

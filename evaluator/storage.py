@@ -1,10 +1,17 @@
 """SQLite persistence and aggregate queries."""
 import json
+import os
+import shutil
 import sqlite3
+import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .dataset import ROOT
+# Ensure ROOT is in sys.path
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 DB_PATH = ROOT / "results" / "codeeval.db"
 SCHEMA = """
@@ -19,10 +26,51 @@ CREATE TABLE IF NOT EXISTS test_results(
 """
 
 
+def resolve_db_path(path=None) -> Path:
+    """Resolve database path, handling serverless read-only filesystems (Vercel, AWS Lambda)."""
+    if path:
+        return Path(path)
+    if os.environ.get("CODEEVAL_DB"):
+        return Path(os.environ["CODEEVAL_DB"])
+
+    is_serverless = bool(
+        os.environ.get("VERCEL")
+        or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+        or os.environ.get("LAMBDA_TASK_ROOT")
+    )
+
+    if is_serverless:
+        tmp_db = Path(tempfile.gettempdir()) / "codeeval.db"
+        if not tmp_db.exists() and DB_PATH.exists() and DB_PATH.stat().st_size > 0:
+            try:
+                shutil.copy2(str(DB_PATH), str(tmp_db))
+            except Exception:
+                pass
+        return tmp_db
+
+    try:
+        DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        test_file = DB_PATH.parent / ".perm_check"
+        test_file.touch()
+        test_file.unlink()
+        return DB_PATH
+    except (OSError, PermissionError):
+        tmp_db = Path(tempfile.gettempdir()) / "codeeval.db"
+        if not tmp_db.exists() and DB_PATH.exists() and DB_PATH.stat().st_size > 0:
+            try:
+                shutil.copy2(str(DB_PATH), str(tmp_db))
+            except Exception:
+                pass
+        return tmp_db
+
+
 def connect(path=None):
-    path = Path(path or DB_PATH)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(path))
+    target = resolve_db_path(path)
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(target))
+    except (OSError, sqlite3.OperationalError):
+        conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript(SCHEMA)

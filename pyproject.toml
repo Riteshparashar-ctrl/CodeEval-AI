@@ -1,2 +1,8 @@
 [tool.fastapi]
-entrypoint = "backend.app:app"
+entrypoint = "main:app"
+
+[tool.vercel]
+entrypoint = "main:app"
+
+[tool.vercel.fastapi.static]
+cdn = true
