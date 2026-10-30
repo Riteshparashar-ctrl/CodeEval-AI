@@ -1,0 +1,354 @@
+{
+  "summary": {
+    "total_tasks": 10,
+    "evaluated_responses": 14,
+    "overall_accuracy_pct": 28.57,
+    "average_score": 88.39,
+    "tests_passed": 98,
+    "tests_failed": 14,
+    "demo_responses": 14
+  },
+  "include_demo": true,
+  "by_category": {
+    "edge_case_failure": 4,
+    "inefficient_algorithm": 3,
+    "runtime_error": 2,
+    "missing_input_validation": 2,
+    "incorrect_assumption": 2,
+    "incorrect_logic": 1
+  },
+  "by_kind": {
+    "edge": 5,
+    "perf": 3,
+    "validation": 2,
+    "logic": 2,
+    "basic": 2
+  },
+  "root_cause": {
+    "incorrect_logic": 7,
+    "performance": 3,
+    "incomplete_implementation": 4
+  },
+  "tasks_ranked": [
+    {
+      "task_id": "CE-M01",
+      "title": "Maximum Subarray Sum",
+      "difficulty": "Medium",
+      "attempts": 2,
+      "avg_score": 72.5,
+      "accuracy_pct": 0.0,
+      "tests_failed": 4,
+      "submissions_with_failures": 2,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-E02",
+      "title": "Alphanumeric Palindrome",
+      "difficulty": "Easy",
+      "attempts": 1,
+      "avg_score": 77.5,
+      "accuracy_pct": 0.0,
+      "tests_failed": 2,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-M02",
+      "title": "First Occurrence Binary Search",
+      "difficulty": "Medium",
+      "attempts": 1,
+      "avg_score": 67.5,
+      "accuracy_pct": 0.0,
+      "tests_failed": 2,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-H01",
+      "title": "Longest Strictly Increasing Subsequence",
+      "difficulty": "Hard",
+      "attempts": 2,
+      "avg_score": 90.0,
+      "accuracy_pct": 0.0,
+      "tests_failed": 2,
+      "submissions_with_failures": 2,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-E01",
+      "title": "Second Largest Distinct Value",
+      "difficulty": "Easy",
+      "attempts": 1,
+      "avg_score": 95.0,
+      "accuracy_pct": 0.0,
+      "tests_failed": 1,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-M04",
+      "title": "Balanced Brackets",
+      "difficulty": "Medium",
+      "attempts": 1,
+      "avg_score": 87.5,
+      "accuracy_pct": 0.0,
+      "tests_failed": 1,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-H03",
+      "title": "Count N-Queens Solutions",
+      "difficulty": "Hard",
+      "attempts": 1,
+      "avg_score": 95.0,
+      "accuracy_pct": 0.0,
+      "tests_failed": 1,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 100.0
+    },
+    {
+      "task_id": "CE-H02",
+      "title": "Edit Distance",
+      "difficulty": "Hard",
+      "attempts": 2,
+      "avg_score": 95.0,
+      "accuracy_pct": 50.0,
+      "tests_failed": 1,
+      "submissions_with_failures": 1,
+      "failure_rate_pct": 50.0
+    },
+    {
+      "task_id": "CE-E03",
+      "title": "Merge Two Sorted Lists",
+      "difficulty": "Easy",
+      "attempts": 2,
+      "avg_score": 100.0,
+      "accuracy_pct": 100.0,
+      "tests_failed": 0,
+      "submissions_with_failures": 0,
+      "failure_rate_pct": 0.0
+    },
+    {
+      "task_id": "CE-M03",
+      "title": "Group Anagrams",
+      "difficulty": "Medium",
+      "attempts": 1,
+      "avg_score": 100.0,
+      "accuracy_pct": 100.0,
+      "tests_failed": 0,
+      "submissions_with_failures": 0,
+      "failure_rate_pct": 0.0
+    }
+  ],
+  "edge_cases": [
+    {
+      "test_id": "CE-E01-validation-1",
+      "kind": "validation",
+      "note": "fewer than two distinct values",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-E02-edge-2",
+      "kind": "edge",
+      "note": "punctuation, spaces, mixed case",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-E02-logic-2",
+      "kind": "logic",
+      "note": "underscore is not alphanumeric",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-H01-logic-1",
+      "kind": "logic",
+      "note": "equal values are not strictly increasing",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-H01-perf-1",
+      "kind": "perf",
+      "note": "200k elements (O(n^2) times out)",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-H02-perf-1",
+      "kind": "perf",
+      "note": "1500 x 1500 characters",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-H03-validation-1",
+      "kind": "validation",
+      "note": "n below 1",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-M01-edge-1",
+      "kind": "edge",
+      "note": "single negative element",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-M01-edge-2",
+      "kind": "edge",
+      "note": "all negative: empty subarray not allowed",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-M01-perf-1",
+      "kind": "perf",
+      "note": "500k elements",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-M02-edge-1",
+      "kind": "edge",
+      "note": "empty list",
+      "failures": 1
+    },
+    {
+      "test_id": "CE-M04-edge-2",
+      "kind": "edge",
+      "note": "unclosed opening bracket",
+      "failures": 1
+    }
+  ],
+  "difficulty": [
+    {
+      "difficulty": "Easy",
+      "attempts": 4,
+      "avg_score": 93.12,
+      "accuracy_pct": 50.0,
+      "failure_rate_pct": 9.38
+    },
+    {
+      "difficulty": "Medium",
+      "attempts": 5,
+      "avg_score": 80.0,
+      "accuracy_pct": 20.0,
+      "failure_rate_pct": 17.5
+    },
+    {
+      "difficulty": "Hard",
+      "attempts": 5,
+      "avg_score": 93.0,
+      "accuracy_pct": 20.0,
+      "failure_rate_pct": 10.0
+    }
+  ],
+  "hardest_difficulty": "Medium",
+  "examples": [
+    {
+      "model_name": "DEMO-B (naive algorithms)",
+      "is_demo": true,
+      "task_id": "CE-H02",
+      "test_id": "CE-H02-perf-1",
+      "kind": "perf",
+      "category": "inefficient_algorithm",
+      "args": "(generated large input)",
+      "expected": "2",
+      "actual": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "model_name": "DEMO-B (naive algorithms)",
+      "is_demo": true,
+      "task_id": "CE-H01",
+      "test_id": "CE-H01-perf-1",
+      "kind": "perf",
+      "category": "inefficient_algorithm",
+      "args": "(generated large input)",
+      "expected": "511",
+      "actual": "timeout after 10.0s"
+    },
+    {
+      "model_name": "DEMO-B (naive algorithms)",
+      "is_demo": true,
+      "task_id": "CE-M01",
+      "test_id": "CE-M01-perf-1",
+      "kind": "perf",
+      "category": "inefficient_algorithm",
+      "args": "(generated large input)",
+      "expected": "124",
+      "actual": "timeout after 10.0s"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-H03",
+      "test_id": "CE-H03-validation-1",
+      "kind": "validation",
+      "category": "missing_input_validation",
+      "args": "[0]",
+      "expected": "raises ValueError",
+      "actual": "1"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-H01",
+      "test_id": "CE-H01-logic-1",
+      "kind": "logic",
+      "category": "incorrect_assumption",
+      "args": "[[7, 7, 7, 7]]",
+      "expected": "1",
+      "actual": "4"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-M04",
+      "test_id": "CE-M04-edge-2",
+      "kind": "edge",
+      "category": "edge_case_failure",
+      "args": "[\"(\"]",
+      "expected": "false",
+      "actual": "true"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-M02",
+      "test_id": "CE-M02-basic-2",
+      "kind": "basic",
+      "category": "runtime_error",
+      "args": "[[1, 2, 3], 4]",
+      "expected": "-1",
+      "actual": "IndexError: list index out of range"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-M02",
+      "test_id": "CE-M02-edge-1",
+      "kind": "edge",
+      "category": "runtime_error",
+      "args": "[[], 1]",
+      "expected": "-1",
+      "actual": "IndexError: list index out of range"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-M01",
+      "test_id": "CE-M01-basic-2",
+      "kind": "basic",
+      "category": "incorrect_logic",
+      "args": "[[2, 3, -1]]",
+      "expected": "5",
+      "actual": "3"
+    },
+    {
+      "model_name": "DEMO-A (mutated reference)",
+      "is_demo": true,
+      "task_id": "CE-M01",
+      "test_id": "CE-M01-edge-1",
+      "kind": "edge",
+      "category": "edge_case_failure",
+      "args": "[[-3]]",
+      "expected": "-3",
+      "actual": "0"
+    }
+  ]
+}
