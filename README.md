@@ -60,35 +60,50 @@ It focuses on:
 ```text
 CodeEval-AI/
 │
-├── backend/
-│   └── app.py
+├── api/
+│   └── index.py             # Vercel serverless entrypoint
 │
-├── frontend/
-│   ├── index.html
-│   ├── submit.html
-│   ├── failures.html
-│   ├── style.css
-│   └── script.js
+├── backend/
+│   └── app.py               # FastAPI application & API endpoints
+│
+├── public/                  # Dashboard & UI static assets
+│   ├── index.html           # Main dashboard
+│   ├── submit.html          # Interactive code submit page
+│   ├── failures.html        # Failure analysis page
+│   ├── style.css            # Responsive dark-theme styling
+│   └── app.js               # Dashboard charts & API interactivity
 │
 ├── dataset/
-│   └── tasks.json
+│   └── tasks.json           # 10 original benchmark tasks (8 tests each)
 │
-├── reference_solutions/
+├── reference_solutions/     # Verified reference solutions (100/100 score)
+│   └── CE-*.py
 │
-├── evaluator/
+├── evaluator/               # Core benchmark engine
+│   ├── runner.py            # Subprocess test runner with timeouts
+│   ├── scoring.py           # 100-point deterministic evaluation rubric
+│   ├── storage.py           # SQLite persistence & aggregate queries
+│   ├── report.py            # Failure analysis & markdown reports
+│   └── harness.py           # Subprocess evaluation harness
 │
-├── tests/
+├── tests/                   # 43 automated unit tests (100% passing)
 │
-├── results/
+├── results/                 # Database storage & seed data
+│   ├── codeeval.db
+│   └── demo_seed.db
 │
-├── reports/
+├── reports/                 # Generated failure analysis reports
+│   ├── failure_report.md
+│   └── failure_report.json
 │
-├── .env.example
-├── .gitignore
-├── LICENSE
-├── README.md
-├── requirements.txt
-└── run.py
+├── .vscode/                 # VS Code settings and launch configuration
+├── app.py                   # Root FastAPI entrypoint
+├── main.py                  # Standard root entrypoint
+├── pyproject.toml           # Package & Vercel deployment metadata
+├── requirements.txt         # Project dependencies
+├── run.py                   # Unified CLI runner (serve, test, validate, demo, submit)
+├── vercel.json              # Vercel deployment configuration
+└── README.md
 ```
 
 ---
@@ -179,14 +194,16 @@ python run.py test
 ### 7. Start the Application
 
 ```bash
-python run.py
+python run.py serve
 ```
+*(Or simply `python run.py`, `python app.py`, or `python main.py`)*
 
-Open the local application in your browser:
+Open the application in your browser:
 
-- Dashboard: `http://127.0.0.1:8000/index.html`
-- Submit Code: `http://127.0.0.1:8000/submit.html`
-- Failure Analysis: `http://127.0.0.1:8000/failures.html`
+- **Dashboard:** [http://127.0.0.1:8000](http://127.0.0.1:8000) (or `/index.html`)
+- **Submit Code:** [http://127.0.0.1:8000/submit](http://127.0.0.1:8000/submit) (or `/submit.html`)
+- **Failure Analysis:** [http://127.0.0.1:8000/failures](http://127.0.0.1:8000/failures) (or `/failures.html`)
+- **API Documentation (Swagger UI):** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 

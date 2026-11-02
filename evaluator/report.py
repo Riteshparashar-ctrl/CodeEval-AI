@@ -8,9 +8,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from .dataset import ROOT
-from .runner import ROOT_CAUSE
-from .storage import _f, _rows, difficulty_performance, summary, task_performance
+from .dataset import ROOT  # noqa: E402
+from .runner import ROOT_CAUSE  # noqa: E402
+from .storage import _f, _rows, difficulty_performance, summary, task_performance  # noqa: E402
 
 REPORT_DIR = ROOT / "reports"
 

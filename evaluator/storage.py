@@ -39,26 +39,34 @@ def resolve_db_path(path=None) -> Path:
         or os.environ.get("LAMBDA_TASK_ROOT")
     )
 
+    seed = ROOT / "results" / "demo_seed.db"
+    source = DB_PATH if (DB_PATH.exists() and DB_PATH.stat().st_size > 0) else seed
+
     if is_serverless:
         tmp_db = Path(tempfile.gettempdir()) / "codeeval.db"
-        if not tmp_db.exists() and DB_PATH.exists() and DB_PATH.stat().st_size > 0:
+        if not tmp_db.exists() and source.exists() and source.stat().st_size > 0:
             try:
-                shutil.copy2(str(DB_PATH), str(tmp_db))
+                shutil.copy2(str(source), str(tmp_db))
             except Exception:
                 pass
         return tmp_db
 
     try:
         DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        if not DB_PATH.exists() and seed.exists() and seed.stat().st_size > 0:
+            try:
+                shutil.copy2(str(seed), str(DB_PATH))
+            except Exception:
+                pass
         test_file = DB_PATH.parent / ".perm_check"
         test_file.touch()
         test_file.unlink()
         return DB_PATH
     except (OSError, PermissionError):
         tmp_db = Path(tempfile.gettempdir()) / "codeeval.db"
-        if not tmp_db.exists() and DB_PATH.exists() and DB_PATH.stat().st_size > 0:
+        if not tmp_db.exists() and source.exists() and source.stat().st_size > 0:
             try:
-                shutil.copy2(str(DB_PATH), str(tmp_db))
+                shutil.copy2(str(source), str(tmp_db))
             except Exception:
                 pass
         return tmp_db

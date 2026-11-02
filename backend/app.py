@@ -5,24 +5,26 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Optional
 
-# Ensure project root is importable (needed on Vercel)
+# Ensure project root is importable (needed on Vercel and direct module execution)
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi.responses import FileResponse  # noqa: E402
+from fastapi.staticfiles import StaticFiles  # noqa: E402
+from pydantic import BaseModel, Field  # noqa: E402
 
-from evaluator import report, storage
-from evaluator.dataset import load_tasks, public_view
-from evaluator.runner import evaluate_code
+from evaluator import report, storage  # noqa: E402
+from evaluator.dataset import load_tasks, public_view  # noqa: E402
+from evaluator.runner import evaluate_code  # noqa: E402
 
 app = FastAPI(title="CodeEval AI", version="1.0.0")
 TASKS = load_tasks()
 BY_ID = {t["id"]: t for t in TASKS}
-FRONTEND_DIR = ROOT / "public"
+
+# Support both 'public' and 'frontend' directories for static assets
+FRONTEND_DIR = (ROOT / "public") if (ROOT / "public").exists() else (ROOT / "frontend")
 
 
 @contextmanager
@@ -57,7 +59,7 @@ def get_task(task_id: str):
 
 @app.post("/api/evaluate")
 def evaluate(req: EvaluateRequest):
-    if os.environ.get("VERCEL"):  # never run arbitrary submitted code on a public deployment
+    if os.environ.get("VERCEL") and not os.environ.get("ENABLE_EVALUATION"):
         raise HTTPException(403, "Evaluation is disabled on the public deployment. Run CodeEval AI locally.")
     task = BY_ID.get(req.task_id)
     if task is None:
@@ -114,7 +116,7 @@ def get_submissions(include_demo: bool = False, limit: int = 100):
 def _page(name: str):
     f = FRONTEND_DIR / name
     if not f.exists():
-        raise HTTPException(404, f"{name} not found in public/")
+        raise HTTPException(404, f"{name} not found")
     return FileResponse(f)
 
 
@@ -139,3 +141,11 @@ def serve_submit():
 # Static assets (app.js, style.css). Mounted last so the routes above win.
 if FRONTEND_DIR.exists():
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="ui")
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=port)

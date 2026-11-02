@@ -132,7 +132,7 @@ def cmd_benchmark(a):
 def main():
     load_env()
     p = argparse.ArgumentParser(description="CodeEval AI")
-    sub = p.add_subparsers(dest="cmd", required=True)
+    sub = p.add_subparsers(dest="cmd", required=False)
     sub.add_parser("validate", help="validate dataset and reference solutions").set_defaults(fn=cmd_validate)
     s = sub.add_parser("serve", help="start dashboard + API")
     s.add_argument("--host", default="127.0.0.1")
@@ -159,7 +159,15 @@ def main():
     s.add_argument("--include-demo", action="store_true")
     s.set_defaults(fn=cmd_report)
     sub.add_parser("test", help="run unit tests").set_defaults(fn=cmd_test)
+
+    if len(sys.argv) == 1:
+        cmd_serve(argparse.Namespace(host="127.0.0.1", port=8000))
+        return
+
     a = p.parse_args()
+    if not hasattr(a, "fn"):
+        p.print_help()
+        return
     try:
         a.fn(a)
     except DatasetError as e:

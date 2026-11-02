@@ -1,0 +1,17 @@
+{
+  "python.defaultInterpreterPath": "D:\\Anaconda\\python.exe",
+  "python.analysis.extraPaths": [
+    ".",
+    "backend",
+    "evaluator"
+  ],
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "warning",
+    "reportUnusedImport": "information"
+  },
+  "files.exclude": {
+    "**/.pytest_cache": true,
+    "**/__pycache__": true
+  }
+}
